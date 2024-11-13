@@ -8,6 +8,7 @@ import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { catchError, map } from 'rxjs/operators'
 import { Subject } from 'rxjs'
+import axios from 'axios'
 
 interface Passwords {
   current?: string
@@ -77,5 +78,31 @@ export class UserService {
 
   upgradeToDeluxe (paymentMode: string, paymentId: any) {
     return this.http.post(this.hostServer + '/rest/deluxe-membership', { paymentMode, paymentId }).pipe(map((response: any) => response.data), catchError((err) => { throw err }))
+  }
+
+  async logEvent(event: string, severity: string, info: any) {
+    const url = 'https://3f2a7f644bd84e60ba9a553e95e1a383.us-central1.gcp.cloud.es.io:443';
+    const apiKey = 'Wkdyd0laTUJJM2hUMnpST3I1b3Q6SFg2SlZzRXlRNmllbE9sMHllZVNyQQ=='
+
+    try {
+      const response = await axios.post(
+        `${url}/juice-shop/_doc`,
+        {
+          timestamp: new Date().toISOString(),
+          event,
+          severity: severity,
+          info: info,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `ApiKey ${apiKey}`,
+          },
+        }
+      );
+      console.log('Log sent successfully:', response.data);
+    } catch (error) {
+      console.error('Error sending log:', error);
+    }
   }
 }
