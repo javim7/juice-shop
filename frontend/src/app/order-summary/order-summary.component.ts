@@ -9,6 +9,7 @@ import { PaymentService } from '../Services/payment.service'
 import { BasketService } from '../Services/basket.service'
 import { Router } from '@angular/router'
 import { DeliveryService } from '../Services/delivery.service'
+import { UserService } from '../Services/user.service'
 import { SnackBarHelperService } from '../Services/snack-bar-helper.service'
 
 @Component({
@@ -23,7 +24,7 @@ export class OrderSummaryComponent implements OnInit {
   public promotionalDiscount = 0
   public address: any
   public paymentMethod: any
-  constructor (private readonly router: Router, private readonly addressService: AddressService, private readonly paymentService: PaymentService, private readonly basketService: BasketService, private readonly deliveryService: DeliveryService, private readonly ngZone: NgZone, private readonly snackBarHelperService: SnackBarHelperService) { }
+  constructor (private readonly router: Router, private readonly userService: UserService, private readonly addressService: AddressService, private readonly paymentService: PaymentService, private readonly basketService: BasketService, private readonly deliveryService: DeliveryService, private readonly ngZone: NgZone, private readonly snackBarHelperService: SnackBarHelperService) { }
 
   ngOnInit () {
     this.deliveryService.getById(sessionStorage.getItem('deliveryMethodId')).subscribe((method) => {
@@ -64,8 +65,10 @@ export class OrderSummaryComponent implements OnInit {
       sessionStorage.removeItem('couponDiscount')
       this.basketService.updateNumberOfCartItems()
       this.ngZone.run(async () => await this.router.navigate(['/order-completion', orderConfirmationId]))
+      this.userService.logEvent('Order placed', 'low', { orderConfirmationId: orderConfirmationId });
     }, (err) => {
       console.log(err)
+      this.userService.logEvent('Order error', 'medium', { error: err });
       this.snackBarHelperService.open(err.error?.error.message, 'errorBar')
     })
   }

@@ -143,6 +143,7 @@ export class NavbarComponent implements OnInit {
     } else {
       this.ngZone.run(async () => await this.router.navigate(['/search']))
     }
+    this.userService.logEvent('Search', 'low', { email: this.userEmail, query: value });
   }
 
   getUserDetails () {
@@ -156,6 +157,7 @@ export class NavbarComponent implements OnInit {
   }
 
   logout () {
+    this.userService.logEvent('Logout', 'low', { email: this.userEmail });
     this.userService.saveLastLoginIp().subscribe((user: any) => { this.noop() }, (err) => { console.log(err) })
     localStorage.removeItem('token')
     this.cookieService.remove('token')

@@ -82,8 +82,8 @@ export class LoginComponent implements OnInit {
     this.userService.login(this.user).subscribe(
       (authentication: any) => {
         // Log successful login
-        console.log("Login successful: ", { email: this.user.email, password: this.passwordControl.value, bid: authentication.bid });
-        this.userService.logEvent('Login successful', 'low', { email: this.user.email, password: this.passwordControl.value, bid: authentication.bid });
+        console.log("Login successful: ", { email: this.user.email });
+        this.userService.logEvent('Login successful', 'low', { email: this.user.email });
 
         localStorage.setItem('token', authentication.token);
         const expires = new Date();
@@ -96,8 +96,8 @@ export class LoginComponent implements OnInit {
       },
       ({ error }) => {
         // Log login error
-        console.log("Login error: ", { email: this.user.email, error: error });
-        this.userService.logEvent('Login error', 'low', { email: this.user.email, error: error });
+        const severity = this.user.email === "admin@juice'sh.op" ? "high" : "medium";
+        this.userService.logEvent('Login error', severity, { email: this.user.email, error: error });
 
         if (error.status && error.data && error.status === 'totp_token_required') {
           localStorage.setItem('totp_tmp_token', error.data.tmpToken);
