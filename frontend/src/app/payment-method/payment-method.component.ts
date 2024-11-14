@@ -12,6 +12,7 @@ import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons/'
 import { TranslateService } from '@ngx-translate/core'
 import { SnackBarHelperService } from '../Services/snack-bar-helper.service'
+import { UserService } from '../Services/user.service'
 
 library.add(faPaperPlane, faTrashAlt)
 
@@ -40,7 +41,7 @@ export class PaymentMethodComponent implements OnInit {
   public cardsExist: boolean = false
   public paymentId: any = undefined
 
-  constructor (public paymentService: PaymentService, private readonly translate: TranslateService, private readonly snackBarHelperService: SnackBarHelperService) { }
+  constructor (public paymentService: PaymentService, private readonly userService: UserService, private readonly translate: TranslateService, private readonly snackBarHelperService: SnackBarHelperService) { }
 
   ngOnInit () {
     this.monthRange = Array.from(Array(12).keys()).map(i => i + 1)
@@ -75,6 +76,7 @@ export class PaymentMethodComponent implements OnInit {
       })
       this.load()
       this.resetForm()
+      this.userService.logEvent('Credit card saved', 'medium', { email: localStorage.getItem('email') });
     }, (err) => {
       this.snackBarHelperService.open(err.error?.error, 'errorBar')
       this.resetForm()

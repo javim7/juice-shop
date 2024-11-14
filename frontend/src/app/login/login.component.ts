@@ -74,16 +74,19 @@ export class LoginComponent implements OnInit {
     this.user.email = this.emailControl.value;
     this.user.password = this.passwordControl.value;
 
-    console.log("Login attempt info:", { email: this.user.email });
+    // console.log("Login attempt info:", { email: this.user.email });
     // Log the attempt to log in
-    this.userService.logEvent('Login attempt', 'low', { email: this.user.email });
+    // this.userService.logEvent('Login attempt', 'low', { email: this.user.email });
 
+    var isSqlInjection = this.isSqlInjection(this.user.email);
+    console.log("SQL injection detected in email:", isSqlInjection);
 
     this.userService.login(this.user).subscribe(
       (authentication: any) => {
         // Log successful login
         console.log("Login successful: ", { email: this.user.email });
-        this.userService.logEvent('Login successful', 'low', { email: this.user.email });
+        // Log succesful login: high if SQL injection is detected, low otherwise
+        this.userService.logEvent('Login successful', isSqlInjection ? 'high' : 'low', { email: this.user.email });
 
         localStorage.setItem('token', authentication.token);
         const expires = new Date();
@@ -120,6 +123,19 @@ export class LoginComponent implements OnInit {
     } else {
       localStorage.removeItem('email');
     }
+  }
+
+  // Funcion para detectar SQL injection en el email
+  isSqlInjection(email: string): boolean {
+      // Patrones de SQL injection comunes
+      const sqlInjectionPatterns = [
+          /('|--|;)/,               
+          /\b(OR|AND)\b/i,          
+          /\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION)\b/i, 
+      ];
+
+      // Verificar si algún patrón coincide con la cadena de email
+      return sqlInjectionPatterns.some(pattern => pattern.test(email));
   }
 
   googleLogin () {

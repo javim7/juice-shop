@@ -136,15 +136,33 @@ export class NavbarComponent implements OnInit {
     }
   }
 
-  search (value: string) {
+  search(value: string) {
     if (value) {
-      const queryParams = { queryParams: { q: value } }
-      this.ngZone.run(async () => await this.router.navigate(['/search'], queryParams))
+      const queryParams = { queryParams: { q: value } };
+      this.ngZone.run(async () => await this.router.navigate(['/search'], queryParams));
     } else {
-      this.ngZone.run(async () => await this.router.navigate(['/search']))
+      this.ngZone.run(async () => await this.router.navigate(['/search']));
     }
-    this.userService.logEvent('Search', 'low', { email: this.userEmail, query: value });
-  }
+
+    // Set log severity based on XSS detection
+    const severity = this.isXssAttempt(value) ? 'high' : 'low';
+    console.log("XSS detection: ", severity);
+    this.userService.logEvent('Search', severity, { email: this.userEmail, query: value });
+}
+
+  // Helper function to detect potential XSS patterns
+  isXssAttempt(value: string): boolean {
+      const xssPatterns = [
+          /<script.*?>.*?<\/script>/i,         
+          /javascript:/i,                      
+          /<iframe.*?>.*?<\/iframe>/i,         
+          /<img.*?src=.*? onerror=.*?>/i,      
+          /<.*?on\w+.*?=.*?>/i                 
+      ];
+
+      // Check if any pattern matches the search query
+      return xssPatterns.some(pattern => pattern.test(value));
+    }
 
   getUserDetails () {
     this.userService.whoAmI().subscribe((user: any) => {
