@@ -65,10 +65,10 @@ export class OrderSummaryComponent implements OnInit {
       sessionStorage.removeItem('couponDiscount')
       this.basketService.updateNumberOfCartItems()
       this.ngZone.run(async () => await this.router.navigate(['/order-completion', orderConfirmationId]))
-      this.userService.logEvent('Order placed', 'low', { orderConfirmationId: orderConfirmationId });
+      this.userService.logEvent('Order placed', 'low', { orderConfirmationId })
     }, (err) => {
       console.log(err)
-      this.userService.logEvent('Order error', 'medium', { error: err });
+      this.userService.logEvent('Order error', 'medium', { error: err })
       this.snackBarHelperService.open(err.error?.error.message, 'errorBar')
     })
   }

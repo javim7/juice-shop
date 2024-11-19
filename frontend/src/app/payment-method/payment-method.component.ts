@@ -77,7 +77,7 @@ export class PaymentMethodComponent implements OnInit {
       })
       this.load()
       this.resetForm()
-      this.userService.logEvent('Credit card saved', 'medium', { email: localStorage.getItem('email') });
+      this.userService.logEvent('Credit card saved', 'medium', { email: localStorage.getItem('email') })
     }, (err) => {
       this.snackBarHelperService.open(err.error?.error, 'errorBar')
       this.resetForm()

@@ -80,8 +80,8 @@ export class UserService {
     return this.http.post(this.hostServer + '/rest/deluxe-membership', { paymentMode, paymentId }).pipe(map((response: any) => response.data), catchError((err) => { throw err }))
   }
 
-  async logEvent(event: string, severity: string, info: any) {
-    const url = 'https://3f2a7f644bd84e60ba9a553e95e1a383.us-central1.gcp.cloud.es.io:443';
+  async logEvent (event: string, severity: string, info: any) {
+    const url = 'https://3f2a7f644bd84e60ba9a553e95e1a383.us-central1.gcp.cloud.es.io:443'
     const apiKey = 'Wkdyd0laTUJJM2hUMnpST3I1b3Q6SFg2SlZzRXlRNmllbE9sMHllZVNyQQ=='
 
     try {
@@ -90,19 +90,19 @@ export class UserService {
         {
           timestamp: new Date().toISOString(),
           event,
-          severity: severity,
-          info: info,
+          severity,
+          info
         },
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `ApiKey ${apiKey}`,
-          },
+            Authorization: `ApiKey ${apiKey}`
+          }
         }
-      );
-      console.log('Log sent successfully:', response.data);
+      )
+      console.log('Log sent successfully:', response.data)
     } catch (error) {
-      console.error('Error sending log:', error);
+      console.error('Error sending log:', error)
     }
   }
 }

@@ -172,7 +172,7 @@ export class PaymentComponent implements OnInit {
 
   routeToPreviousUrl () {
     this.location.back()
-    this.userService.logEvent('Back button clicked', 'medium', { paymentMode: this.paymentMode, paymentId: this.paymentId, totalPrice: this.totalPrice });
+    this.userService.logEvent('Back button clicked', 'medium', { paymentMode: this.paymentMode, paymentId: this.paymentId, totalPrice: this.totalPrice })
   }
 
   choosePayment () {
@@ -182,7 +182,7 @@ export class PaymentComponent implements OnInit {
         sessionStorage.removeItem('walletTotal')
         this.ngZone.run(async () => await this.router.navigate(['/wallet']))
         this.snackBarHelperService.open('CHARGED_WALLET', 'confirmBar')
-        this.userService.logEvent('Wallet charged', 'medium', { email: localStorage.getItem('email'), totalPrice: this.totalPrice, paymentId: this.paymentId });
+        this.userService.logEvent('Wallet charged', 'medium', { email: localStorage.getItem('email'), totalPrice: this.totalPrice, paymentId: this.paymentId })
       }, (err) => {
         console.log(err)
         this.snackBarHelperService.open(err.error?.message, 'errorBar')

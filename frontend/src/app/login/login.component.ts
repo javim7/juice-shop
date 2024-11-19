@@ -69,73 +69,73 @@ export class LoginComponent implements OnInit {
     this.formSubmitService.attachEnterKeyHandler('login-form', 'loginButton', () => { this.login() })
   }
 
-  login() {
-    this.user = {};
-    this.user.email = this.emailControl.value;
-    this.user.password = this.passwordControl.value;
+  login () {
+    this.user = {}
+    this.user.email = this.emailControl.value
+    this.user.password = this.passwordControl.value
 
     // console.log("Login attempt info:", { email: this.user.email });
     // Log the attempt to log in
     // this.userService.logEvent('Login attempt', 'low', { email: this.user.email });
 
-    var isSqlInjection = this.isSqlInjection(this.user.email);
-    console.log("SQL injection detected in email:", isSqlInjection);
+    const isSqlInjection = this.isSqlInjection(this.user.email)
+    console.log('SQL injection detected in email:', isSqlInjection)
 
     this.userService.login(this.user).subscribe(
       (authentication: any) => {
         // Log successful login
-        console.log("Login successful: ", { email: this.user.email });
+        console.log('Login successful: ', { email: this.user.email })
         // Log succesful login: high if SQL injection is detected, low otherwise
-        this.userService.logEvent('Login successful', isSqlInjection ? 'high' : 'low', { email: this.user.email });
+        this.userService.logEvent('Login successful', isSqlInjection ? 'high' : 'low', { email: this.user.email })
 
-        localStorage.setItem('token', authentication.token);
-        const expires = new Date();
-        expires.setHours(expires.getHours() + 8);
-        this.cookieService.put('token', authentication.token, { expires });
-        sessionStorage.setItem('bid', authentication.bid);
-        this.basketService.updateNumberOfCartItems();
-        this.userService.isLoggedIn.next(true);
-        this.ngZone.run(async () => await this.router.navigate(['/search']));
+        localStorage.setItem('token', authentication.token)
+        const expires = new Date()
+        expires.setHours(expires.getHours() + 8)
+        this.cookieService.put('token', authentication.token, { expires })
+        sessionStorage.setItem('bid', authentication.bid)
+        this.basketService.updateNumberOfCartItems()
+        this.userService.isLoggedIn.next(true)
+        this.ngZone.run(async () => await this.router.navigate(['/search']))
       },
       ({ error }) => {
         // Log login error
-        const severity = this.user.email === "admin@juice'sh.op" ? "high" : "medium";
-        this.userService.logEvent('Login error', severity, { email: this.user.email, error: error });
+        const severity = this.user.email === "admin@juice'sh.op" ? 'high' : 'medium'
+        this.userService.logEvent('Login error', severity, { email: this.user.email, error })
 
         if (error.status && error.data && error.status === 'totp_token_required') {
-          localStorage.setItem('totp_tmp_token', error.data.tmpToken);
-          this.ngZone.run(async () => await this.router.navigate(['/2fa/enter']));
-          return;
+          localStorage.setItem('totp_tmp_token', error.data.tmpToken)
+          this.ngZone.run(async () => await this.router.navigate(['/2fa/enter']))
+          return
         }
-        
-        localStorage.removeItem('token');
-        this.cookieService.remove('token');
-        sessionStorage.removeItem('bid');
-        this.error = error;
-        this.userService.isLoggedIn.next(false);
-        this.emailControl.markAsPristine();
-        this.passwordControl.markAsPristine();
+
+        localStorage.removeItem('token')
+        this.cookieService.remove('token')
+        sessionStorage.removeItem('bid')
+        this.error = error
+        this.userService.isLoggedIn.next(false)
+        this.emailControl.markAsPristine()
+        this.passwordControl.markAsPristine()
       }
-    );
+    )
 
     if (this.rememberMe.value) {
-      localStorage.setItem('email', this.user.email);
+      localStorage.setItem('email', this.user.email)
     } else {
-      localStorage.removeItem('email');
+      localStorage.removeItem('email')
     }
   }
 
   // Funcion para detectar SQL injection en el email
-  isSqlInjection(email: string): boolean {
-      // Patrones de SQL injection comunes
-      const sqlInjectionPatterns = [
-          /('|--|;)/,               
-          /\b(OR|AND)\b/i,          
-          /\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION)\b/i, 
-      ];
+  isSqlInjection (email: string): boolean {
+    // Patrones de SQL injection comunes
+    const sqlInjectionPatterns = [
+      /('|--|;)/,
+      /\b(OR|AND)\b/i,
+      /\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION)\b/i
+    ]
 
-      // Verificar si algún patrón coincide con la cadena de email
-      return sqlInjectionPatterns.some(pattern => pattern.test(email));
+    // Verificar si algún patrón coincide con la cadena de email
+    return sqlInjectionPatterns.some(pattern => pattern.test(email))
   }
 
   googleLogin () {
