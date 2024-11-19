@@ -40,6 +40,7 @@ export class PaymentMethodComponent implements OnInit {
   public yearRange: any[]
   public cardsExist: boolean = false
   public paymentId: any = undefined
+  // este es un comentario nuevo
 
   constructor (public paymentService: PaymentService, private readonly userService: UserService, private readonly translate: TranslateService, private readonly snackBarHelperService: SnackBarHelperService) { }
 
